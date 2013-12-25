@@ -3,7 +3,7 @@ BomBom
 
 Simple project based on Quickblox mBaaS. (http://quickblox.com)
 
-This is story reader. (Like 9GAG on iPhone)  
+App represents posts's reader with ability to view all posts, create new one, write comments. 
 
 Uses next modules: Users, Custom objects and Content.
 
