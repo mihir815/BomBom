@@ -27,5 +27,5 @@ Posts and comments based on CO.
 
 
 
-
+UPD: if you have error - Quickblox doesn't found - simply drag it from "3d party/Quickblox" folder to Frameworks
 
