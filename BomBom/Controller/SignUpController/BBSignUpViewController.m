@@ -63,44 +63,7 @@
 
 	[BBSpinnerView showSpinner];
 	
-	[[QBClient shared] signUpWithLogin:self.login.text
-								  pass:self.pass.text
-								 block:^(QBUUser *aUser, NSError *anError) {
-									 [BBSpinnerView showSpinner];
-									 if (aUser) {
-										 [[QBClient shared] signInWithLogin:self.login.text
-																	   pass:self.pass.text
-																	  block:^(QBUUser *aUser, NSError *anError) {
-																		  if (aUser) {
-																			  [[QBClient shared] uploadImage:self.avatar.image block:^(NSUInteger blobID, NSError *anError) {
-																				  if (blobID != 0) {
-																					  [[QBClient shared] updateCurrentUserBlobId:blobID block:^(QBUUser *aUser, NSError *anError) {
-																						  [BBSpinnerView hideSpinner];
-																						  
-																						  if (aUser) {
-																							  [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-																							  [self performSegueWithIdentifier:kSuccessSignUpSegue sender:nil];
-																						  }else{
-																							   [QBClient showAlertForError:anError];
-																						  }
-																					  }];
-																					  
-																				  }else{
-																					   [BBSpinnerView hideSpinner];
-																					   [QBClient showAlertForError:anError];
-																				  }
-																			  }];
-																			  
-																		  }else{
-																			  [BBSpinnerView hideSpinner];
-																			  [QBClient showAlertForError:anError];
-																		  }
-										 }];
-									 }else{
-										 [BBSpinnerView hideSpinner];
-										 [QBClient showAlertForError:anError];
-									 }
-								 }];
+    [self signUpWithLogin:self.login.text pass:self.pass.text];
 }
 
 - (IBAction)pickImage:(id)sender {
@@ -115,6 +78,58 @@
 															   self.avatar.image = croppedImage;
 														   }
 	}];
+}
+
+-(void) signUpWithLogin:(NSString *)login pass:(NSString *)pass {
+    [[QBClient shared] signUpWithLogin:login
+								  pass:pass
+								 block:^(QBUUser *aUser, NSError *anError) {
+									 [BBSpinnerView showSpinner];
+									 if (aUser) {
+                                         [self signInWithLogin:login pass:pass];
+                
+                                     }else{
+										 [BBSpinnerView hideSpinner];
+										 [QBClient showAlertForError:anError];
+									 }
+								 }];
+}
+
+-(void) signInWithLogin:(NSString *)login pass:(NSString *)pass {
+    [[QBClient shared] signInWithLogin:self.login.text
+                                  pass:self.pass.text
+                                 block:^(QBUUser *aUser, NSError *anError) {
+                                     if (aUser) {
+                                         [self uploadAvatarImage];
+                                         
+                                     }else{
+                                         [BBSpinnerView hideSpinner];
+                                         [QBClient showAlertForError:anError];
+                                     }
+                                 }];
+
+}
+
+-(void) uploadAvatarImage {
+    [[QBClient shared] uploadImage:self.avatar.image block:^(NSUInteger blobID, NSError *anError) {
+        if (blobID != 0) {
+            [[QBClient shared] updateCurrentUserBlobId:blobID block:^(QBUUser *aUser, NSError *anError) {
+                [BBSpinnerView hideSpinner];
+                
+                if (aUser) {
+                    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+                    [self performSegueWithIdentifier:kSuccessSignUpSegue sender:nil];
+                }else{
+                    [QBClient showAlertForError:anError];
+                }
+            }];
+            
+        }else{
+            [BBSpinnerView hideSpinner];
+            [QBClient showAlertForError:anError];
+        }
+    }];
+
 }
 
 @end
